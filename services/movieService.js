@@ -12,6 +12,8 @@ const getfilterType = (showing, search) => {
   const filterType = {
     NOW: `WHERE open_date <= date_format(now(),('%Y-%m-%d'))`,
     UPCOMING: `WHERE open_date > date_format(now(),('%Y-%m-%d'))`,
+    DOMESTIC: `WHERE country = '한국'`,
+    INTERNATIONAL: `WHERE NOT country = '한국'`,
     SEARCH: `WHERE title LIKE "%${search}%"`,
   };
   if (search) {
@@ -22,6 +24,12 @@ const getfilterType = (showing, search) => {
   }
   if (showing === 'upcoming') {
     return filterType.UPCOMING;
+  }
+  if (showing === 'domestic') {
+    return filterType.DOMESTIC;
+  }
+  if (showing === 'international') {
+    return filterType.INTERNATIONAL;
   }
   if (!showing) {
     return '';
