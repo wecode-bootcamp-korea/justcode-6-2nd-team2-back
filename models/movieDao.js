@@ -1,4 +1,5 @@
 const { myDataSource } = require('../utils/dataSource');
+const { BaseError } = require('../middleware/errorConstructor');
 
 const getMovies = async (showingType, sortType, pagenation) => {
   try {
@@ -30,9 +31,7 @@ const getMovies = async (showingType, sortType, pagenation) => {
     `);
     return movieList;
   } catch (err) {
-    const error = new Error('INVALID_DATA_INPUT');
-    error.statusCode = '500';
-    throw error;
+    throw new BaseError('INVALID_DATA_INPUT', 500);
   }
 };
 
@@ -106,9 +105,7 @@ const getMovieById = async (movieId) => {
     );
     return movieDetail;
   } catch (err) {
-    const error = new Error('INVALID_DATA_INPUT');
-    error.statusCode = '500';
-    throw error;
+    throw new BaseError('INVALID_DATA_INPUT', 500);
   }
 };
 module.exports = { getMovies, getMovieById };
