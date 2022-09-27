@@ -10,7 +10,7 @@ const getMovies = async (showingType, sortType, pagenation) => {
     m.book_rate,
     date_format(open_date, '%Y-%m-%d') as open_date,
     movie_grades.grade_image,
-    (SELECT
+    (SELECT 
       COUNT(movie_id)
       FROM
       users_movies_likes
@@ -60,6 +60,11 @@ const getMovieById = async (movieId) => {
         FROM
         movie_grades
         WHERE movie_grades.id = m.grade) grade_name,
+      (SELECT
+        grade_image
+        FROM
+        movie_grades
+        WHERE movie_grades.id = m.grade) grade_image,
       (SELECT
         COUNT(movie_id)
         FROM
