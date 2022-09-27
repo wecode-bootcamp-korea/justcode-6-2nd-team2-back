@@ -3,25 +3,33 @@ const userDao = require('../models/userDao');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { BaseError } = require('../middleware/errorConstructor');
+const { temporaryPasswordIssue } = require('../utils/validation');
 
-const createUser = async (name, phone, birth, email, account_id, password, kiosk, gps_consent) => {
+const createUserWithOnlyPhone = async (name, phone, birth) => {
+  return await userDao.createUserWithPhoneInfo(name, phone, birth);
+}
+const createUserWithFullInfo = async (_, phone, __, email, account_id, password) => {
   const salt = bcrypt.genSaltSync();
   const hashedPw = bcrypt.hashSync(password, salt);
-  return await userDao.createUser(name, phone, birth, email, account_id, hashedPw, kiosk, gps_consent);
+  const { id } = await userDao.readIdByPhone(phone);
+  return await userDao.updateUserInfo(email, account_id, hashedPw, id);
 };
-
+//회원가입할 때 아이디 중복검사 체크용
 const accountCheckWhencreateUser = async (account_id) => {
-  return await userDao.readUserByAccount(account_id);
+  return await userDao.readAccountIdByAccountId(account_id);
 }
-
-
-const emailCheckWhencreateUser = async (email) => {
-  return await userDao.readUserByEmail(email);
+//전화인증 확인시 체크용 1
+const idCheckWhencreateUser = async (phone) => {
+  return await userDao.readAccountIdByPhone(phone);
 }
-
+//2
 const phoneCheckWhencreateUser = async (phone) => {
-  return await userDao.readUserByPhone(phone);
+  return await userDao.readUserPhoneByPhone(phone);
 };
+
+const readIdWhenCreateUserByPhone = async (phone) => {
+  return await userDao.readIdByPhone(phone);
+}
 
 const loginUser = async (account_id, password) => {
   const user = await userDao.getUserInfomation(account_id);
@@ -47,4 +55,31 @@ const loginUser = async (account_id, password) => {
   }
 }
 
-module.exports = { createUser, accountCheckWhencreateUser, emailCheckWhencreateUser, phoneCheckWhencreateUser, loginUser };
+const findAccount = async (name, birth, phone) => {
+  return await userDao.findUserAccount(name, birth, phone);
+}
+
+const findPassword = async (name, birth, phone, account_id) => {
+  const newPassword = temporaryPasswordIssue();
+  console.log(newPassword);
+  const salt = bcrypt.genSaltSync();
+  const hashedPw = bcrypt.hashSync(newPassword, salt);
+  await userDao.changeUserPassword(hashedPw, name, birth, phone, account_id);
+  return newPassword;
+}
+
+const viewInformation = async (account_id) => {
+  return await userDao.viewInformation(account_id);
+}
+
+module.exports = { 
+  createUserWithFullInfo,
+  createUserWithOnlyPhone, 
+  accountCheckWhencreateUser, 
+  phoneCheckWhencreateUser, 
+  idCheckWhencreateUser, 
+  readIdWhenCreateUserByPhone, 
+  loginUser, 
+  findAccount, 
+  findPassword, 
+  viewInformation };
