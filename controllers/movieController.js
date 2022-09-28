@@ -1,5 +1,10 @@
 const movieService = require('../services/movieService');
 
+const getMainMovies = async (req, res) => {
+  const mainMovies = await movieService.getMainMovies();
+  res.status(200).json({ data: mainMovies });
+};
+
 const getMovies = async (req, res) => {
   const pageInfo = req.query;
   const showing = pageInfo['showing'];
@@ -16,4 +21,4 @@ const getMovieById = async (req, res) => {
   res.status(200).json({ data: movieDetail });
 };
 
-module.exports = { getMovies, getMovieById };
+module.exports = { getMainMovies, getMovies, getMovieById };

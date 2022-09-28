@@ -4,6 +4,7 @@ const movieController = require('../controllers/movieController');
 
 const router = express.Router();
 
+router.get('/', errorHandler(movieController.getMainMovies));
 router.get('/list', errorHandler(movieController.getMovies));
 router.get('/detail/:id', errorHandler(movieController.getMovieById));
 

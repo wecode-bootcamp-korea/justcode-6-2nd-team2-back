@@ -74,8 +74,8 @@ const getTimeSchedule = async (result) => {
       end_time,
         (SELECT COUNT(*) FROM seats WHERE theater_screen_id = schedule.theater_screen_id) as total_seat,
         (SELECT COUNT(*)
-        FROM starbox.test_bookings
-        LEFT JOIN test_tickets ON test_tickets.booking_id = test_bookings.id
+        FROM starbox.bookings
+        LEFT JOIN tickets ON tickets.booking_id = bookings.id
         WHERE schedule_id = schedule.id) as booked_seat
       FROM 
       schedule
@@ -124,9 +124,9 @@ const getSeatsByScheduleId = async (scheduleId) => {
       schedule_id,
       JSON_ARRAYAGG(seat_name)as seat_list
       FROM
-      test_tickets
-      LEFT JOIN test_bookings ON test_bookings.id = test_tickets.booking_id
-      LEFT JOIN seats ON seats.id = test_tickets.seats_id
+      tickets
+      LEFT JOIN bookings ON bookings.id = tickets.booking_id
+      LEFT JOIN seats ON seats.id = tickets.seats_id
       WHERE schedule_id = ?
       GROUP BY schedule_id) booked_seats
     ON schedule.id = booked_seats.schedule_id
@@ -145,7 +145,7 @@ const createBookingId = async (userId, scheduleId) => {
     const createBookingId = await myDataSource.query(
       `
     INSERT INTO 
-    test_bookings 
+    bookings 
     (user_Id, schedule_id) 
     VALUES
     (?,?)
@@ -163,9 +163,9 @@ const getBookingId = async (userId, scheduleId) => {
     const [bookingId] = await myDataSource.query(
       `
     SELECT
-    test_bookings.id
+    bookings.id
     FROM
-    test_bookings
+    bookings
     WHERE user_Id = ?
     AND schedule_id = ?
     `,
@@ -182,7 +182,7 @@ const createTicket = async (price, seatsName, bookingId, ticketType) => {
     const createTicket = await myDataSource.query(
       `
       INSERT INTO
-      test_tickets
+      tickets
       (price, ticket_status, seats_id, booking_id, ticket_type)
       VALUES
       (?,?,?,?,?)`,
@@ -213,11 +213,11 @@ const getSeatId = async (scheduleId, seatsName) => {
   }
 };
 
-const getTickets = async (userId) => {
+const getTickets = async (accountId) => {
   try {
     const tickets = await myDataSource.query(
       `SELECT
-      test_bookings.id as booking_id,
+      bookings.id as booking_id,
       schedule.poster_img,
       schedule.title,
       CONCAT(schedule.theater_name,' / ',schedule.screen_name) as theater_detail,
@@ -227,26 +227,26 @@ const getTickets = async (userId) => {
         (SELECT 
         JSON_ARRAYAGG(
         seat_name) seats_name
-        FROM starbox.test_tickets
-        INNER JOIN seats ON seats.id = test_tickets.seats_id
-        WHERE booking_id = test_bookings.id
+        FROM starbox.tickets
+        INNER JOIN seats ON seats.id = tickets.seats_id
+        WHERE booking_id = bookings.id
         GROUP BY booking_id) as seats_name,
       users.phone,
         (SELECT 
         JSON_ARRAYAGG(ticket_type) 
-        FROM starbox.test_tickets
-        WHERE test_tickets.booking_id = test_bookings.id
+        FROM starbox.tickets
+        WHERE tickets.booking_id = bookings.id
         GROUP BY booking_id
         )as person,
       CONCAT('총 ',COUNT(*),'명') as person_count
       FROM
-      test_bookings
-      LEFT JOIN test_tickets ON test_bookings.id = test_tickets.booking_id
-      LEFT JOIN schedule ON test_bookings.schedule_id = schedule.id
-      LEFT JOIN users ON users.id = test_bookings.user_id
-      WHERE user_id = ?
-      GROUP BY test_bookings.id`,
-      [userId]
+      bookings
+      LEFT JOIN tickets ON bookings.id = tickets.booking_id
+      LEFT JOIN schedule ON bookings.schedule_id = schedule.id
+      LEFT JOIN users ON users.id = bookings.user_id
+      WHERE users.account_id = ?
+      GROUP BY bookings.id`,
+      [accountId]
     );
     return tickets;
   } catch (err) {
