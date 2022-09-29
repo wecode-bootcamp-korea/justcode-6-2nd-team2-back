@@ -1,5 +1,11 @@
 const movieDao = require('../models/movieDao');
 
+const getMainMovies = async () => {
+  const mainPagenation = 'LIMIT 4';
+  const mainMovies = await movieDao.getMovies('', '', mainPagenation);
+  return mainMovies;
+};
+
 const getMovies = async (showing, sort, search, page) => {
   const filterType = getfilterType(showing, search);
   const sortType = getSortType(sort);
@@ -71,4 +77,8 @@ const getMovieById = async (movieId) => {
   return movieDetail;
 };
 
-module.exports = { getMovies, getMovieById };
+const createMovieLike = async (userId, movieId) => {
+  await movieDao.createMovieLike(userId, movieId);
+};
+
+module.exports = { getMainMovies, getMovies, getMovieById, createMovieLike };

@@ -102,12 +102,29 @@ const getMovieById = async (movieId) => {
             )review_options ON r.id = review_options.review_id
         LEFT JOIN users ON users.account_id = r.account_id
         WHERE movie_id = m.id
-        GROUP BY movie_id) reviews
+        GROUP BY movie_id
+        ORDER BY r.content ASC
+        ) reviews
       FROM
       movies m
     WHERE m.id = ?
     `,
       [movieId]
+    );
+    return movieDetail;
+  } catch (err) {
+    throw new BaseError('INVALID_DATA_INPUT', 500);
+  }
+};
+
+const getUserIdByAccountId = async (movieId) => {
+  try {
+    const movieDetail = await myDataSource.query(
+      `
+      SELECT
+      m.id as movie_id,
+      m.title,
+      `
     );
     return movieDetail;
   } catch (err) {

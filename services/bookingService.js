@@ -8,7 +8,7 @@ const getSchedule = async (date, movieId, areaId, theaterId) => {
   const movies = await bookingDao.getMovies(movieFilter);
   const areas = await bookingDao.getAreas(areaFilter);
   const therters = await getTheater(areaId);
-  const timeTables = await getTimeTables(date, movieId, theaterId);
+  const timeTables = await getTimeTables(date, movieId, areaId, theaterId);
 
   return {
     movies: movies,
@@ -45,21 +45,32 @@ const getMovieFilter = async (date) => {
   } else return '';
 };
 
-const getTimeTables = async (date, movieId, theaterId) => {
+const getTimeTables = async (date, movieId, areaId, theaterId) => {
   const filterType = {
     DATE: `WHERE watch_date = "${date}"`,
     MOVIE_ID: `AND movie_id IN (${movieId})`,
+    AREA_ID: `AND area_id = "${areaId}"`,
     THEATER_ID: `AND theater_id IN (${theaterId})`,
   };
 
   let result = '';
 
-  if (!date || !movieId || !theaterId) {
+  if (!date || !areaId) {
     return '';
   }
 
-  if (date && movieId && theaterId) {
-    result = filterType.DATE + filterType.MOVIE_ID + filterType.THEATER_ID;
+  if (date && movieId && areaId && theaterId) {
+    result = filterType.DATE + filterType.MOVIE_ID + filterType.AREA_ID + filterType.THEATER_ID;
+    return await bookingDao.getTimeSchedule(result);
+  }
+
+  if (date && areaId && theaterId) {
+    result = filterType.DATE + filterType.AREA_ID + filterType.THEATER_ID;
+    return await bookingDao.getTimeSchedule(result);
+  }
+
+  if (date && areaId && movieId) {
+    result = filterType.DATE + filterType.AREA_ID + filterType.MOVIE_ID;
     return await bookingDao.getTimeSchedule(result);
   }
 };
@@ -81,9 +92,9 @@ const getSeatsByScheduleId = async (scheduleId) => {
 
 const createTicket = async (userId, scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName) => {
   const priceType = {
-    ADULT: 14000,
-    TEENAGER: 12000,
-    KID: 9000,
+    ADULT: 12000,
+    TEENAGER: 10000,
+    KID: 7000,
   };
 
   const createBookingId = await bookingDao.createBookingId(userId, scheduleId); // 1. booking테이블생성
@@ -132,8 +143,8 @@ const getTicketType = async (adultNumber, teenagerNumber, kidNumber) => {
   return ticketType;
 };
 
-const getTickets = async (userId) => {
-  const tickets = await bookingDao.getTickets(userId);
+const getTickets = async (accountId) => {
+  const tickets = await bookingDao.getTickets(accountId);
   for (const obj of tickets) {
     obj.seats_name = JSON.parse(obj.seats_name);
     obj.person = JSON.parse(obj.person);
