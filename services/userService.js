@@ -1,4 +1,5 @@
 const userDao = require('../models/userDao');
+const bookingDao = require('../models/bookingDao');
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -50,7 +51,7 @@ const loginUser = async (account_id, password) => {
     //process.env.secretKey    
     return { 
         accessToken: token,
-        user_id: user.account_id
+        account_id: user.account_id
     };  
   }
 }
@@ -72,6 +73,17 @@ const viewInformation = async (account_id) => {
   return await userDao.viewInformation(account_id);
 }
 
+const getMyPage = async (account_id) => {
+  const {name} = await userDao.getUserNameByAccountId(account_id);
+  console.log(name);
+    const tickets = await bookingDao.getTickets(account_id);
+    for (const obj of tickets) {
+      obj.seats_name = JSON.parse(obj.seats_name);
+      obj.person = JSON.parse(obj.person);
+    }
+    return { name, tickets };
+}
+
 module.exports = { 
   createUserWithFullInfo,
   createUserWithOnlyPhone, 
@@ -82,4 +94,5 @@ module.exports = {
   loginUser, 
   findAccount, 
   findPassword, 
-  viewInformation };
+  viewInformation,
+  getMyPage };

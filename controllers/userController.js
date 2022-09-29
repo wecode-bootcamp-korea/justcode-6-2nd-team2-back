@@ -216,9 +216,9 @@ const modifyAccount = async (req, res) => {
 }
 
 const getMyPage = async (req, res) => {
-  const { account_id } = req.body;
-
-  
+  const account_id = req.account_id;
+  const mypage = await userService.getMyPage(account_id);
+  return res.status(200).json({ mypage });
 }
 
 module.exports = { 
