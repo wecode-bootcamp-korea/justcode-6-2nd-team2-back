@@ -90,7 +90,7 @@ const getMovieById = async (movieId) => {
           'created_at', TIMESTAMPDIFF(minute,date_format(r.created_at, '%Y-%m-%d %H:%i:%s'),date_format(now(),'%Y-%m-%d %H:%i:%s')),
           'options', review_options.options)
           )as reviews
-        FROM reviews r
+        FROM (SELECT *, ROW_NUMBER () OVER (ORDER BY reviews.created_at desc) FROM reviews) as r
         LEFT JOIN (
           SELECT
             review_id,
