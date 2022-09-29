@@ -43,9 +43,9 @@ const sendVerificationSMS = async (req, res) => {
       console.log(4);
       const signature = hash.toString(CryptoJS.enc.Base64);
       console.log(5);
-      Cache.del(user_phone_number);
-      Cache.put(user_phone_number, verificationCode.toString());
-
+      // Cache.del(user_phone_number);
+      const CachedData = Cache.put(user_phone_number, verificationCode.toString());
+      console.log(CachedData);
       // sens 서버로 요청 전송
       const smsRes = await axios({
         method: method,
@@ -76,15 +76,21 @@ const checkVerificationSMS = async (req, res) => {
   const { name, phone, birth, verificationCode } = req.body;
   const user_phone_number = phone.split("-").join("");
   const CacheData = Cache.get(user_phone_number);
+  console.log(CacheData);
   try{
-    const idCheckWithPhone = await userService.idCheckWhencreateUser(user_phone_number); 
+    const idCheckWithPhone = await userService.idCheckWhencreateUser(user_phone_number);
+    console.log("idCheckWithPhone: ", idCheckWithPhone);
     const phoneCheckwithPhone = await userService.phoneCheckWhencreateUser(user_phone_number);
-    if (idCheckWithPhone.account_id) {
-      return res.status(400).json({ message: "EXISTED_PHONENUMBER" })
+    if(idCheckWithPhone) {
+      if(idCheckWithPhone.account_id){
+      return res.status(400).json({ message: "EXISTED_PHONENUMBER" });
+      }
     }
-    if(phoneCheckwithPhone.phone) {
+    if(phoneCheckwithPhone) {
+      if(phoneCheckwithPhone.phone) {
       Cache.del(user_phone_number);
       return res.status(200).json({ message: "PHONE_CHECKED"});
+      }
     }
     else if (!CacheData) {
       const err = new BaseError("PLEASE ENTER CODE");
@@ -99,6 +105,7 @@ const checkVerificationSMS = async (req, res) => {
     await userService.createUserWithOnlyPhone(name, user_phone_number, birth);
     res.status(200).json({ message: "VERIFICATION SUCCESS" });
   } catch (err) {
+    console.log(err);
     res.status(err.statusCode || 500).json({ err: err.message });
   }
 };
@@ -140,11 +147,14 @@ const createUser = async (req, res) => {
 
 const accountIdCheck = async (req, res) => {
   const { account_id } = req.body;
-  const idCheck =  userService.accountCheckWhencreateUser(account_id);
+  const idCheck =  await userService.accountCheckWhencreateUser(account_id);
+  console.log(idCheck);
   if(idCheck) {
+    if(idCheck.account_id === account_id) {
     res.status(200).json({ message: 'USER_ALREADY_EXISTS' });
+    }
   }else{
-    res.status(400).json({ message: 'USER_AVAILABLE' });
+    res.status(200).json({ message: 'USER_AVAILABLE' });
   };
 }
 
@@ -205,6 +215,12 @@ const modifyAccount = async (req, res) => {
   return await userService.modifyAccount(password)
 }
 
+const getMyPage = async (req, res) => {
+  const { account_id } = req.body;
+
+  
+}
+
 module.exports = { 
   sendVerificationSMS, 
   checkVerificationSMS, 
@@ -214,4 +230,5 @@ module.exports = {
   findAccount, 
   findPassword, 
   viewInformation, 
-  modifyAccount };
+  modifyAccount,
+  getMyPage };
