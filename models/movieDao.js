@@ -1,38 +1,6 @@
 const { myDataSource } = require('../utils/dataSource');
 const { BaseError } = require('../middleware/errorConstructor');
 
-const getMainMovies = async () => {
-  try {
-    const movieList = await myDataSource.query(`
-    SELECT
-    m.id,
-    m.title,
-    m.book_rate,
-    date_format(open_date, '%Y-%m-%d') as open_date,
-    movie_grades.grade_image,
-    (SELECT 
-      COUNT(movie_id)
-      FROM
-      users_movies_likes
-      WHERE movie_id = m.id) likes,
-    (SELECT
-      TRUNCATE(AVG(rate),1)
-      FROM
-      reviews
-      WHERE movie_id = m.id) reviews_rate,
-    m.poster_img,
-    m.detail_content
-    FROM
-    movies m
-    LEFT JOIN movie_grades ON  m.grade = movie_grades.id
-    LIMIT 4
-    `);
-    return movieList;
-  } catch (err) {
-    throw new BaseError('INVALID_DATA_INPUT', 500);
-  }
-};
-
 const getMovies = async (showingType, sortType, pagenation) => {
   try {
     const movieList = await myDataSource.query(`
@@ -72,6 +40,7 @@ const getMovieById = async (movieId) => {
     const movieDetail = await myDataSource.query(
       `
       SELECT
+      m.id as movie_id,
       m.title,
       m.eng_title,
       date_format(open_date, '%Y-%m-%d') as open_date,
@@ -131,9 +100,11 @@ const getMovieById = async (movieId) => {
             JOIN options ON review_options.option_id = options.id
             GROUP BY review_id
             )review_options ON r.id = review_options.review_id
-        LEFT JOIN users ON users.id = r.account_id
+        LEFT JOIN users ON users.account_id = r.account_id
         WHERE movie_id = m.id
-        GROUP BY movie_id) reviews
+        GROUP BY movie_id
+        ORDER BY r.content ASC
+        ) reviews
       FROM
       movies m
     WHERE m.id = ?
@@ -145,4 +116,19 @@ const getMovieById = async (movieId) => {
     throw new BaseError('INVALID_DATA_INPUT', 500);
   }
 };
-module.exports = { getMainMovies, getMovies, getMovieById };
+
+const getUserIdByAccountId = async (movieId) => {
+  try {
+    const movieDetail = await myDataSource.query(
+      `
+      SELECT
+      m.id as movie_id,
+      m.title,
+      `
+    );
+    return movieDetail;
+  } catch (err) {
+    throw new BaseError('INVALID_DATA_INPUT', 500);
+  }
+};
+module.exports = { getMovies, getMovieById };
