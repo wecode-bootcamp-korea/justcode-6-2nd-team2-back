@@ -21,11 +21,18 @@ const getMovieById = async (req, res) => {
   res.status(200).json({ data: movieDetail });
 };
 
-const createMovieLike = async (req, res) => {
-  const { userId, movieId } = req.body;
-  await movieService.createMovieLike(userId, movieId);
-
-  res.status(200).json({ message: 'CREATED_LIKE' });
+const getMoviePictuers = async (req, res) => {
+  const movieId = req.params.id;
+  console.log('TEST:', movieId);
+  const moviePictuers = await movieService.getMoviePictuers(movieId);
+  res.status(200).json({ data: moviePictuers });
 };
 
-module.exports = { getMainMovies, getMovies, getMovieById, createMovieLike };
+const updateMovieLike = async (req, res) => {
+  const accountId = req.accountId;
+  const { movie_id } = req.body;
+  const movieLike = await movieService.updateMovieLike(accountId, movie_id);
+  res.status(200).json({ message: 'UPDATED_LIKE', isExist: movieLike });
+};
+
+module.exports = { getMainMovies, getMovies, getMovieById, getMoviePictuers, updateMovieLike };

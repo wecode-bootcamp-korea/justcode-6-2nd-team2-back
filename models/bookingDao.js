@@ -254,6 +254,24 @@ const getTickets = async (accountId) => {
   }
 };
 
+const getUserIdByAccountId = async (accountId) => {
+  try {
+    const [userId] = await myDataSource.query(
+      `
+      SELECT
+      users.id
+      FROM
+      users
+      WHERE users.account_id = ?
+      `,
+      [accountId]
+    );
+    return Object.values(userId)[0];
+  } catch (err) {
+    throw new BaseError('INVALID_DATA_INPUT', 500);
+  }
+};
+
 module.exports = {
   getMovies,
   getAreas,
@@ -265,4 +283,5 @@ module.exports = {
   createTicket,
   getSeatId,
   getTickets,
+  getUserIdByAccountId,
 };
