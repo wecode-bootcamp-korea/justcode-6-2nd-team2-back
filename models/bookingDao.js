@@ -213,7 +213,7 @@ const getSeatId = async (scheduleId, seatsName) => {
   }
 };
 
-const getTickets = async (accountId) => {
+const getTickets = async (account_id) => {
   try {
     const tickets = await myDataSource.query(
       `SELECT
@@ -246,7 +246,7 @@ const getTickets = async (accountId) => {
       LEFT JOIN users ON users.id = bookings.user_id
       WHERE users.account_id = ?
       GROUP BY bookings.id`,
-      [accountId]
+      [account_id]
     );
     return tickets;
   } catch (err) {
@@ -254,7 +254,7 @@ const getTickets = async (accountId) => {
   }
 };
 
-const getUserIdByAccountId = async (accountId) => {
+const getUserIdByAccountId = async (account_id) => {
   try {
     const [userId] = await myDataSource.query(
       `
@@ -264,7 +264,7 @@ const getUserIdByAccountId = async (accountId) => {
       users
       WHERE users.account_id = ?
       `,
-      [accountId]
+      [account_id]
     );
     return Object.values(userId)[0];
   } catch (err) {

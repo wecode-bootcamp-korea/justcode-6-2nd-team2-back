@@ -82,8 +82,8 @@ const getMoviePictuers = async (movieId) => {
   return moviePictuers;
 };
 
-const updateMovieLike = async (accountId, movieId) => {
-  const userId = await movieDao.getUserIdByAccountId(accountId);
+const updateMovieLike = async (account_id, movieId) => {
+  const userId = await movieDao.getUserIdByAccountId(account_id);
   const isExist = await movieDao.existCheckMovieLike(userId, movieId);
   if (isExist) {
     await movieDao.deleteMovieLike(userId, movieId);
