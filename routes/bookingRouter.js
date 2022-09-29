@@ -8,8 +8,7 @@ const router = express.Router();
 
 router.get('/schedule', errorHandler(bookingController.getSchedule));
 router.get('/schedule/:id', errorHandler(bookingController.getSeatsByScheduleId));
-router.post('/ticket', errorHandler(bookingController.createTicket));
-router.get('/tickets', errorHandler(bookingController.getTickets));
-router.get('/test', auth.isAuthenticated, errorHandler(bookingController.getTickets));
+router.post('/ticket', auth.isAuthenticated, errorHandler(bookingController.createTicket));
+router.get('/tickets', auth.isAuthenticated, errorHandler(bookingController.getTickets));
 
 module.exports = router;

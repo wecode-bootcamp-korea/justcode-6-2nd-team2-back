@@ -5,7 +5,7 @@ const getMovies = async (showingType, sortType, pagenation) => {
   try {
     const movieList = await myDataSource.query(`
     SELECT
-    m.id,
+    m.id AS movie_id,
     m.title,
     m.book_rate,
     date_format(open_date, '%Y-%m-%d') as open_date,
@@ -117,18 +117,95 @@ const getMovieById = async (movieId) => {
   }
 };
 
-const getUserIdByAccountId = async (movieId) => {
+const getMoviePictuers = async (movieId) => {
   try {
-    const movieDetail = await myDataSource.query(
+    const moviePictuers = await myDataSource.query(
       `
       SELECT
-      m.id as movie_id,
-      m.title,
-      `
+      movie_id,
+      trailer,
+      movie_img
+      FROM
+      movie_pictures
+      WHERE movie_id = ?
+      `,
+      [movieId]
     );
-    return movieDetail;
+    return moviePictuers;
   } catch (err) {
     throw new BaseError('INVALID_DATA_INPUT', 500);
   }
 };
-module.exports = { getMovies, getMovieById };
+
+const getUserIdByAccountId = async (accountId) => {
+  try {
+    const [userId] = await myDataSource.query(
+      `
+      SELECT
+      users.id
+      FROM
+      users
+      WHERE users.account_id = ?
+      `,
+      [accountId]
+    );
+    return Object.values(userId)[0];
+  } catch (err) {
+    throw new BaseError('INVALID_DATA_INPUT', 500);
+  }
+};
+
+const existCheckMovieLike = async (userId, movieId) => {
+  try {
+    const [isExist] = await myDataSource.query(
+      `
+      SELECT exists
+      (SELECT
+      *
+      FROM
+      users_movies_likes
+      WHERE user_id = ?
+      AND movie_id = ?) AS isExist
+      `,
+      [userId, movieId]
+    );
+    return +Object.values(isExist)[0];
+  } catch (err) {
+    throw new BaseError('INVALID_DATA_INPUT', 500);
+  }
+};
+
+const createMovieLike = async (userId, movieId) => {
+  try {
+    const test = await myDataSource.query(
+      `
+      INSERT INTO
+      users_movies_likes
+      (user_id,movie_id)
+      VALUES
+      (?,?)
+      `,
+      [userId, movieId]
+    );
+  } catch (err) {
+    throw new BaseError('INVALID_DATA_INPUT', 500);
+  }
+};
+
+const deleteMovieLike = async (userId, movieId) => {
+  try {
+    await myDataSource.query(
+      `
+      DELETE FROM
+      users_movies_likes
+      WHERE user_id = ?
+      AND movie_id = ?
+      `,
+      [userId, movieId]
+    );
+  } catch (err) {
+    throw new BaseError('INVALID_DATA_INPUT', 500);
+  }
+};
+
+module.exports = { getMovies, getMovieById, getMoviePictuers, getUserIdByAccountId, existCheckMovieLike, createMovieLike, deleteMovieLike };

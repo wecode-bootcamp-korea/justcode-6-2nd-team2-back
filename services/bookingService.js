@@ -90,12 +90,13 @@ const getSeatsByScheduleId = async (scheduleId) => {
   return movieSchedule;
 };
 
-const createTicket = async (userId, scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName) => {
+const createTicket = async (accountId, scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName) => {
   const priceType = {
     ADULT: 12000,
     TEENAGER: 10000,
     KID: 7000,
   };
+  const userId = await bookingDao.getUserIdByAccountId(accountId);
 
   const createBookingId = await bookingDao.createBookingId(userId, scheduleId); // 1. booking테이블생성
   const bookingId = await bookingDao.getBookingId(userId, scheduleId); // 2.booking 테이블의 ID 조회

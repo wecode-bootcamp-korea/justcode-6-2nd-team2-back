@@ -77,8 +77,21 @@ const getMovieById = async (movieId) => {
   return movieDetail;
 };
 
-const createMovieLike = async (userId, movieId) => {
-  await movieDao.createMovieLike(userId, movieId);
+const getMoviePictuers = async (movieId) => {
+  const moviePictuers = await movieDao.getMoviePictuers(movieId);
+  return moviePictuers;
 };
 
-module.exports = { getMainMovies, getMovies, getMovieById, createMovieLike };
+const updateMovieLike = async (accountId, movieId) => {
+  const userId = await movieDao.getUserIdByAccountId(accountId);
+  const isExist = await movieDao.existCheckMovieLike(userId, movieId);
+  if (isExist) {
+    await movieDao.deleteMovieLike(userId, movieId);
+    return isExist;
+  } else {
+    await movieDao.createMovieLike(userId, movieId);
+    return isExist;
+  }
+};
+
+module.exports = { getMainMovies, getMovies, getMovieById, getMoviePictuers, updateMovieLike };
