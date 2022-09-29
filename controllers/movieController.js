@@ -21,4 +21,11 @@ const getMovieById = async (req, res) => {
   res.status(200).json({ data: movieDetail });
 };
 
-module.exports = { getMainMovies, getMovies, getMovieById };
+const createMovieLike = async (req, res) => {
+  const { userId, movieId } = req.body;
+  await movieService.createMovieLike(userId, movieId);
+
+  res.status(200).json({ message: 'CREATED_LIKE' });
+};
+
+module.exports = { getMainMovies, getMovies, getMovieById, createMovieLike };

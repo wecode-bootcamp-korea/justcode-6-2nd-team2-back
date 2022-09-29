@@ -19,8 +19,8 @@ const createTicket = async (req, res) => {
 };
 
 const getTickets = async (req, res) => {
-  // const accountId = req.accountId;
-  const { accountId } = req.body;
+  const accountId = req.accountId;
+  // const { accountId } = req.body;
   const tickets = await bookingService.getTickets(accountId);
   res.status(200).json({ data: tickets });
 };
