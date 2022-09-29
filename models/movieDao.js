@@ -40,6 +40,7 @@ const getMovieById = async (movieId) => {
     const movieDetail = await myDataSource.query(
       `
       SELECT
+      m.id as movie_id,
       m.title,
       m.eng_title,
       date_format(open_date, '%Y-%m-%d') as open_date,
@@ -89,7 +90,7 @@ const getMovieById = async (movieId) => {
           'created_at', TIMESTAMPDIFF(minute,date_format(r.created_at, '%Y-%m-%d %H:%i:%s'),date_format(now(),'%Y-%m-%d %H:%i:%s')),
           'options', review_options.options)
           )as reviews
-        FROM reviews r
+        FROM (SELECT *, ROW_NUMBER () OVER (ORDER BY reviews.created_at desc) FROM reviews) as r
         LEFT JOIN (
           SELECT
             review_id,
@@ -99,7 +100,7 @@ const getMovieById = async (movieId) => {
             JOIN options ON review_options.option_id = options.id
             GROUP BY review_id
             )review_options ON r.id = review_options.review_id
-        LEFT JOIN users ON users.id = r.account_id
+        LEFT JOIN users ON users.account_id = r.account_id
         WHERE movie_id = m.id
         GROUP BY movie_id) reviews
       FROM

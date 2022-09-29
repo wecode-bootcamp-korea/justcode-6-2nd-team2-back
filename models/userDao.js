@@ -31,6 +31,7 @@ const readAccountIdByPhone = async (phone) => {
   FROM users
   WHERE phone = ?
   `, [phone]);
+  console.log("check user", user);
   return user;
 }
 
