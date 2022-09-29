@@ -15,7 +15,7 @@ const isAuthenticated = async (req, res, next) => {
     // 복호회된 어카운트아이디가 유저테이블이 있으면 ok, 없으면 catch 던져
     const userData = await userService.accountCheckWhencreateUser(userObj.account_id);
     if (userData) {
-      req.accountId = Object.values(userData)[0];
+      req.account_id = Object.values(userData)[0];
       // console.log(next());
       return next();
     } else {

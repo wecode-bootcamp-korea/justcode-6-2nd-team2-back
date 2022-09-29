@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const router = express.Router();
+const auth = require('../middleware/authCheck');
 
 //router.'method'('url', memberController.'modulename');
 router.post('/signup', userController.createUser);
@@ -15,7 +16,7 @@ router.post('/find/password', userController.findPassword);
 router.post('/mypage', userController.viewInformation);
 router.post('/modify', userController.modifyAccount);
 //mypage
-router.get('/mypage', userController.getMyPage);
+router.get('/mypage', auth.isAuthenticated, userController.getMyPage);
 
 
 module.exports = router;

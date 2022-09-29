@@ -91,4 +91,25 @@ const changeUserPassword = async (hashedPw, name, birth, phone, account_id) => {
 //   return user;
 // }
 
-module.exports = { createUserWithPhoneInfo, updateUserInfo, readIdByPhone, readAccountIdByPhone, readIdByPhone, getUserInfomation, readUserPhoneByPhone, readAccountIdByAccountId, findUserAccount, changeUserPassword };
+const getUserNameByAccountId = async(account_id) => {
+  console.log("user_accountID_DAO : ", account_id);
+  const [name] = await myDataSource.query(`
+    SELECT name FROM users
+    WHERE account_id = ?
+  `, [account_id]);
+  return name; 
+}
+
+module.exports = { 
+  createUserWithPhoneInfo,
+  updateUserInfo, 
+  readIdByPhone, 
+  readAccountIdByPhone, 
+  readIdByPhone, 
+  getUserInfomation, 
+  readUserPhoneByPhone, 
+  readAccountIdByAccountId, 
+  findUserAccount, 
+  changeUserPassword,
+  getUserNameByAccountId
+};
