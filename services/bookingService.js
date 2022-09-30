@@ -90,13 +90,13 @@ const getSeatsByScheduleId = async (scheduleId) => {
   return movieSchedule;
 };
 
-const createTicket = async (accountId, scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName) => {
+const createTicket = async (account_id, scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName) => {
   const priceType = {
     ADULT: 12000,
     TEENAGER: 10000,
     KID: 7000,
   };
-  const userId = await bookingDao.getUserIdByAccountId(accountId);
+  const userId = await bookingDao.getUserIdByAccountId(account_id);
 
   const createBookingId = await bookingDao.createBookingId(userId, scheduleId); // 1. booking테이블생성
   const bookingId = await bookingDao.getBookingId(userId, scheduleId); // 2.booking 테이블의 ID 조회
@@ -144,8 +144,8 @@ const getTicketType = async (adultNumber, teenagerNumber, kidNumber) => {
   return ticketType;
 };
 
-const getTickets = async (accountId) => {
-  const tickets = await bookingDao.getTickets(accountId);
+const getTickets = async (account_id) => {
+  const tickets = await bookingDao.getTickets(account_id);
   for (const obj of tickets) {
     obj.seats_name = JSON.parse(obj.seats_name);
     obj.person = JSON.parse(obj.person);

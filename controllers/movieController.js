@@ -29,9 +29,9 @@ const getMoviePictuers = async (req, res) => {
 };
 
 const updateMovieLike = async (req, res) => {
-  const accountId = req.accountId;
+  const account_id = req.account_id;
   const { movie_id } = req.body;
-  const movieLike = await movieService.updateMovieLike(accountId, movie_id);
+  const movieLike = await movieService.updateMovieLike(account_id, movie_id);
   res.status(200).json({ message: 'UPDATED_LIKE', isExist: movieLike });
 };
 

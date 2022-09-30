@@ -137,7 +137,7 @@ const getMoviePictuers = async (movieId) => {
   }
 };
 
-const getUserIdByAccountId = async (accountId) => {
+const getUserIdByAccountId = async (account_id) => {
   try {
     const [userId] = await myDataSource.query(
       `
@@ -147,7 +147,7 @@ const getUserIdByAccountId = async (accountId) => {
       users
       WHERE users.account_id = ?
       `,
-      [accountId]
+      [account_id]
     );
     return Object.values(userId)[0];
   } catch (err) {

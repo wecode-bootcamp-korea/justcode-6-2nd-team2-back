@@ -13,15 +13,15 @@ const getSeatsByScheduleId = async (req, res) => {
 };
 
 const createTicket = async (req, res) => {
-  const accountId = req.accountId;
+  const account_id = req.account_id;
   const { scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName } = req.body;
-  await bookingService.createTicket(accountId, scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName);
+  await bookingService.createTicket(account_id, scheduleId, adultNumber, teenagerNumber, kidNumber, seatsName);
   res.status(201).json({ message: 'TICKET_CREATED' });
 };
 
 const getTickets = async (req, res) => {
-  const accountId = req.accountId;
-  const tickets = await bookingService.getTickets(accountId);
+  const account_id = req.account_id;
+  const tickets = await bookingService.getTickets(account_id);
   res.status(200).json({ data: tickets });
 };
 
